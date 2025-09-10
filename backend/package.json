@@ -23,7 +23,8 @@
     "graphql-tag": "^2.12.6",
     "joi": "^18.0.1",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.18.0"
+    "mongoose": "^8.18.0",
+    "uuid": "^13.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

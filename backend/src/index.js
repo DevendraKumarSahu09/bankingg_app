@@ -8,6 +8,8 @@ import dotenv from "dotenv";
 import { typeDefs, resolvers } from './graphql/schema.js';
 import {authMiddleware} from "./middleware/auth.js"
 
+import accountRoutes from "./routes/accountRoutes.js"
+
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -24,6 +26,8 @@ const startServer = async () => {
         res.send('GraphQL Server is running! Visit /graphql for the GraphQL playground.');
     });
 
+    app.use("/api/accounts", accountRoutes);
+    // app.use("/api/loans", loanRoutes);
 
     app.use(
         '/graphql',

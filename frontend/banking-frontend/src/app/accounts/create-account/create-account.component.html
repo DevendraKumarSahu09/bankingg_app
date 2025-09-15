@@ -1,0 +1,50 @@
+ 
+<div class="min-h-screen bg-gray-50">
+  <app-navbar></app-navbar>
+  
+  <div class="max-w-md mx-auto py-12 px-4 sm:px-6 lg:px-8">
+    <div class="bg-white py-8 px-6 shadow rounded-lg sm:px-10">
+      <div class="mb-6">
+        <h2 class="text-3xl font-extrabold text-gray-900">Create New Account</h2>
+        <p class="mt-2 text-sm text-gray-600">Choose the type of account you want to create</p>
+      </div>
+
+      <!-- Success Message -->
+      <div *ngIf="success" class="mb-4 bg-green-50 border border-green-200 rounded-md p-4">
+        <div class="text-green-800">{{ success }}</div>
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="error" class="mb-4 bg-red-50 border border-red-200 rounded-md p-4">
+        <div class="text-red-800">{{ error }}</div>
+      </div>
+
+      <form [formGroup]="createAccountForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        <div>
+          <label for="type" class="block text-sm font-medium text-gray-700">Account Type</label>
+          <select id="type" formControlName="type" 
+                  class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            <option value="">Select account type</option>
+            <option *ngFor="let type of accountTypes" [value]="type.value">{{ type.label }}</option>
+          </select>
+          <div *ngIf="type?.invalid && type?.touched" class="mt-1 text-sm text-red-600">
+            <div *ngIf="type?.errors?.['required']">Account type is required</div>
+          </div>
+        </div>
+
+        <div class="flex space-x-4">
+          <button type="button" 
+                  (click)="router.navigate(['/accounts'])"
+                  class="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Cancel
+          </button>
+          <button type="submit" 
+                  [disabled]="loading || !createAccountForm.valid"
+                  class="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50">
+            {{ loading ? 'Creating...' : 'Create Account' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

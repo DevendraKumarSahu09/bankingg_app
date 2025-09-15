@@ -1,0 +1,160 @@
+<div class="min-h-screen bg-gray-100 font-sans">
+    <app-navbar></app-navbar>
+
+    <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
+        <div class="mb-10" *ngIf="currentUser$ | async as user">
+            <h1 class="text-4xl font-extrabold text-gray-900 leading-tight">
+                Welcome back, {{ user.name }}! 👋
+            </h1>
+            <p class="mt-2 text-lg text-gray-500">Here's a quick overview of your banking activity.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div class="bg-white rounded-2xl shadow-lg transform transition duration-300 hover:scale-105">
+                <div class="p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center">
+                                <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v.01M12 20v.01M4 12h.01M20 12h.01M6.343 6.343l-.01.01M17.657 17.657l-.01.01M6.343 17.657l-.01.01M17.657 6.343l-.01.01"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-5 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500">Total Balance</dt>
+                                <dd class="text-2xl font-bold text-gray-900 mt-1">${{ totalBalance | number:'1.2-2' }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg transform transition duration-300 hover:scale-105">
+                <div class="p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-sky-500 rounded-full flex items-center justify-center">
+                                <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-5 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500">Active Accounts</dt>
+                                <dd class="text-2xl font-bold text-gray-900 mt-1">{{ accounts.length }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg transform transition duration-300 hover:scale-105">
+                <div class="p-6">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <div class="w-12 h-12 bg-rose-500 rounded-full flex items-center justify-center">
+                                <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-5 flex-1">
+                            <dl>
+                                <dt class="text-sm font-medium text-gray-500">Active Loans</dt>
+                                <dd class="text-2xl font-bold text-gray-900 mt-1">{{ loans.length }}</dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+            <a routerLink="/accounts/create" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-5 px-6 rounded-xl transition duration-300 text-center shadow-md hover:shadow-lg">
+                <div class="text-lg">Open New Account</div>
+                <div class="text-sm opacity-80 mt-1">Start your financial journey</div>
+            </a>
+            <a routerLink="/transfer" class="bg-teal-600 hover:bg-teal-700 text-white font-semibold py-5 px-6 rounded-xl transition duration-300 text-center shadow-md hover:shadow-lg">
+                <div class="text-lg">Transfer Funds</div>
+                <div class="text-sm opacity-80 mt-1">Send money securely</div>
+            </a>
+            <a routerLink="/loans/apply" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-5 px-6 rounded-xl transition duration-300 text-center shadow-md hover:shadow-lg">
+                <div class="text-lg">Apply for a Loan</div>
+                <div class="text-sm opacity-80 mt-1">Get the financing you need</div>
+            </a>
+            <a routerLink="/accounts" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold py-5 px-6 rounded-xl transition duration-300 text-center shadow-md hover:shadow-lg">
+                <div class="text-lg">View All Accounts</div>
+                <div class="text-sm opacity-80 mt-1">Check all your accounts</div>
+            </a>
+        </div>
+
+        <div class="bg-white shadow-xl rounded-2xl mb-10">
+            <div class="px-6 py-5 border-b border-gray-200 sm:px-8">
+                <h3 class="text-xl font-bold leading-6 text-gray-900">Your Accounts</h3>
+                <p class="mt-1 text-sm text-gray-500">Your five most recent accounts and their status.</p>
+            </div>
+            <ul class="divide-y divide-gray-200">
+                <li *ngFor="let account of accounts.slice(0, 5)" class="px-6 py-5 hover:bg-gray-50 transition duration-150 ease-in-out">
+                    <div class="flex items-center justify-between">
+                        <div class="flex flex-col">
+                            <div class="text-base font-semibold text-gray-900">
+                                {{ account.type | titlecase }} Account
+                            </div>
+                            <div class="mt-1 text-sm text-gray-500">
+                                Account #{{ account.accountNumber }}
+                            </div>
+                        </div>
+                        <div class="text-right flex flex-col items-end">
+                            <div class="text-base font-bold text-gray-900">
+                                ${{ account.balance | number:'1.2-2' }}
+                            </div>
+                            <div class="mt-1 text-sm text-gray-500">
+                                Status: <span class="font-medium">{{ account.status | titlecase }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li *ngIf="accounts.length === 0" class="px-6 py-5 text-center text-gray-500">
+                    No accounts found. <a routerLink="/accounts/create" class="text-blue-600 hover:text-blue-500 font-semibold">Create your first account</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="bg-white shadow-xl rounded-2xl" *ngIf="loans.length > 0">
+            <div class="px-6 py-5 border-b border-gray-200 sm:px-8">
+                <h3 class="text-xl font-bold leading-6 text-gray-900">Your Loans</h3>
+                <p class="mt-1 text-sm text-gray-500">Your current loan status.</p>
+            </div>
+            <ul class="divide-y divide-gray-200">
+                <li *ngFor="let loan of loans.slice(0, 3)" class="px-6 py-5 hover:bg-gray-50 transition duration-150 ease-in-out">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div class="text-base font-semibold text-gray-900">
+                                {{ loan.loanType | titlecase }} Loan
+                            </div>
+                            <span class="ml-3 px-3 py-1 rounded-full text-xs font-semibold"
+                                [ngClass]="{
+                                    'bg-yellow-100 text-yellow-800': loan.status === 'pending',
+                                    'bg-green-100 text-green-800': loan.status === 'approved',
+                                    'bg-red-100 text-red-800': loan.status === 'rejected'
+                                }">
+                                {{ loan.status | titlecase }}
+                            </span>
+                        </div>
+                        <div class="text-right flex flex-col items-end">
+                            <div class="text-base font-bold text-gray-900">
+                                ${{ loan.amount | number:'1.2-2' }}
+                            </div>
+                            <div class="mt-1 text-sm text-gray-500">
+                                <span class="font-medium">{{ loan.tenureMonths }}</span> months
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

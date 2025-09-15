@@ -1,0 +1,204 @@
+ 
+<div class="min-h-screen bg-gray-50">
+  <app-navbar></app-navbar>
+  
+  <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Loading State -->
+    <div *ngIf="loading && !account" class="text-center py-4">
+      <div class="text-gray-500">Loading account details...</div>
+    </div>
+
+    <div *ngIf="account" class="space-y-6">
+      <!-- Account Header -->
+      <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">Account Details</h3>
+          <p class="mt-1 max-w-2xl text-sm text-gray-500">{{ account.type | titlecase }} Account</p>
+        </div>
+        <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+          <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+            <div>
+              <dt class="text-sm font-medium text-gray-500">Account Number</dt>
+              <dd class="mt-1 text-sm text-gray-900 font-mono">{{ account.accountNumber }}</dd>
+            </div>
+            <div>
+              <dt class="text-sm font-medium text-gray-500">Account Type</dt>
+              <dd class="mt-1 text-sm text-gray-900">{{ account.type | titlecase }}</dd>
+            </div>
+            <div>
+              <dt class="text-sm font-medium text-gray-500">Current Balance</dt>
+              <dd class="mt-1 text-2xl font-bold text-green-600">${{ account.balance | number:'1.2-2' }}</dd>
+            </div>
+            <div>
+              <dt class="text-sm font-medium text-gray-500">Status</dt>
+              <dd class="mt-1">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      [ngClass]="{
+                        'bg-green-100 text-green-800': account.status === 'active',
+                        'bg-yellow-100 text-yellow-800': account.status === 'frozen',
+                        'bg-red-100 text-red-800': account.status === 'suspended'
+                      }">
+                  {{ account.status | titlecase }}
+                </span>
+              </dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div *ngIf="success" class="bg-green-50 border border-green-200 rounded-md p-4">
+        <div class="text-green-800">{{ success }}</div>
+      </div>
+      <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-md p-4">
+        <div class="text-red-800">{{ error }}</div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="bg-white shadow sm:rounded-lg">
+        <div class="border-b border-gray-200">
+          <nav class="-mb-px flex space-x-8 px-6" aria-label="Tabs">
+            <button (click)="setActiveTab('overview')" 
+                    [class]="activeTab === 'overview' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                    class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+              Overview
+            </button>
+            <button (click)="setActiveTab('deposit')"
+                    [class]="activeTab === 'deposit' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                    class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+              Deposit
+            </button>
+            <button (click)="setActiveTab('withdraw')"
+                    [class]="activeTab === 'withdraw' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                    class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+              Withdraw
+            </button>
+            <button (click)="setActiveTab('transactions')"
+                    [class]="activeTab === 'transactions' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+                    class="whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm">
+              Transactions
+            </button>
+          </nav>
+        </div>
+
+        <div class="p-6">
+          <!-- Overview Tab -->
+          <div *ngIf="activeTab === 'overview'">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="bg-blue-50 p-4 rounded-lg">
+                <div class="text-sm text-blue-600 font-medium">Total Transactions</div>
+                <div class="text-2xl font-bold text-blue-900">{{ account.transactions.length || 0 }}</div>
+              </div>
+              <div class="bg-green-50 p-4 rounded-lg">
+                <div class="text-sm text-green-600 font-medium">Available Balance</div>
+                <div class="text-2xl font-bold text-green-900">${{ account.balance | number:'1.2-2' }}</div>
+              </div>
+              <div class="bg-purple-50 p-4 rounded-lg">
+                <div class="text-sm text-purple-600 font-medium">Account Status</div>
+                <div class="text-2xl font-bold text-purple-900">{{ account.status | titlecase }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Deposit Tab -->
+          <div *ngIf="activeTab === 'deposit'">
+            <form [formGroup]="depositForm" (ngSubmit)="onDeposit()" class="max-w-md">
+              <div class="space-y-4">
+                <div>
+                  <label for="depositAmount" class="block text-sm font-medium text-gray-700">Deposit Amount</label>
+                  <div class="mt-1 relative rounded-md shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span class="text-gray-500 sm:text-sm">$</span>
+                    </div>
+                    <input type="number" id="depositAmount" formControlName="amount" step="0.01" min="0.01"
+                           class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
+                           placeholder="0.00">
+                  </div>
+                  <div *ngIf="depositForm.get('amount')?.invalid && depositForm.get('amount')?.touched" class="mt-1 text-sm text-red-600">
+                    <div *ngIf="depositForm.get('amount')?.errors?.['required']">Amount is required</div>
+                    <div *ngIf="depositForm.get('amount')?.errors?.['min']">Amount must be greater than 0</div>
+                  </div>
+                </div>
+                <button type="submit" [disabled]="loading || !depositForm.valid"
+                        class="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md text-sm font-medium disabled:opacity-50">
+                  {{ loading ? 'Processing...' : 'Deposit' }}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Withdraw Tab -->
+          <div *ngIf="activeTab === 'withdraw'">
+            <form [formGroup]="withdrawForm" (ngSubmit)="onWithdraw()" class="max-w-md">
+              <div class="space-y-4">
+                <div>
+                  <label for="withdrawAmount" class="block text-sm font-medium text-gray-700">Withdraw Amount</label>
+                  <div class="mt-1 relative rounded-md shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span class="text-gray-500 sm:text-sm">$</span>
+                    </div>
+                    <input type="number" id="withdrawAmount" formControlName="amount" step="0.01" min="0.01" [max]="account.balance"
+                           class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md"
+                           placeholder="0.00">
+                  </div>
+                  <div class="mt-1 text-xs text-gray-500">Available balance: ${{ account.balance | number:'1.2-2' }}</div>
+                  <div *ngIf="withdrawForm.get('amount')?.invalid && withdrawForm.get('amount')?.touched" class="mt-1 text-sm text-red-600">
+                    <div *ngIf="withdrawForm.get('amount')?.errors?.['required']">Amount is required</div>
+                    <div *ngIf="withdrawForm.get('amount')?.errors?.['min']">Amount must be greater than 0</div>
+                  </div>
+                </div>
+                <button type="submit" [disabled]="loading || !withdrawForm.valid"
+                        class="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md text-sm font-medium disabled:opacity-50">
+                  {{ loading ? 'Processing...' : 'Withdraw' }}
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Transactions Tab -->
+          <div *ngIf="activeTab === 'transactions'">
+            <div class="space-y-4">
+              <div *ngFor="let transaction of getRecentTransactions()" 
+                   class="flex justify-between items-center p-4 border border-gray-200 rounded-lg">
+                <div>
+                  <div class="font-medium">{{ transaction.type | titlecase }}</div>
+                  <div class="text-sm text-gray-500">{{ transaction.timestamp | date:'medium' }}</div>
+                  <div class="text-xs text-gray-400">{{ transaction.txnId }}</div>
+                </div>
+                <div class="text-right">
+                  <div class="font-medium" 
+                       [ngClass]="{
+                         'text-green-600': transaction.type === 'deposit',
+                         'text-red-600': transaction.type === 'withdraw',
+                         'text-blue-600': transaction.type === 'transfer'
+                       }">
+                    {{ transaction.type === 'withdraw' ? '-' : '+' }}${{ transaction.amount | number:'1.2-2' }}
+                  </div>
+                  <div class="text-sm" 
+                       [ngClass]="{
+                         'text-green-600': transaction.status === 'success',
+                         'text-yellow-600': transaction.status === 'pending',
+                         'text-red-600': transaction.status === 'failed'
+                       }">
+                    {{ transaction.status | titlecase }}
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="!account.transactions || account.transactions.length === 0" class="text-center py-4 text-gray-500">
+                No transactions found
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Back Button -->
+      <div class="flex justify-start">
+        <button (click)="router.navigate(['/accounts'])" 
+                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+          Back to Accounts
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

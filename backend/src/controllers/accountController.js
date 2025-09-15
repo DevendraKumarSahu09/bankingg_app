@@ -47,6 +47,25 @@ export const getAccounts = async (req, res) => {
   }
 };
 
+export const getAccountById = async (req, res) => {
+  try {
+    const account = await Account.findById(req.params.id);
+    if (!account) {
+      return res.status(404).json({ error: "Account not found." });
+    }
+    
+    // Check if user owns this account
+    if (account.userId.toString() !== req.user.userId) {
+      return res.status(403).json({ error: "Forbidden: You do not own this account." });
+    }
+    
+    res.status(200).json(account);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch account: " + err.message });
+  }
+};
+
+
 
 export const deposit = async (req, res) => {
   try {

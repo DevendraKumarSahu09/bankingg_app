@@ -1,0 +1,65 @@
+<nav class="bg-gray-800 shadow-xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+            <div class="flex items-center">
+                <div class="flex-shrink-0 flex items-center">
+                    <h1 class="text-white text-2xl font-extrabold tracking-wide">BankingApp</h1>
+                </div>
+                <div class="hidden md:ml-10 md:flex md:space-x-4">
+                    <a routerLink="/dashboard" routerLinkActive="text-gray-200 border-b-2 border-gray-400"
+                       class="text-gray-400 hover:text-white transition duration-200 px-3 py-2 text-sm font-medium">
+                        Dashboard
+                    </a>
+                    <a routerLink="/accounts" routerLinkActive="text-gray-200 border-b-2 border-gray-400"
+                       class="text-gray-400 hover:text-white transition duration-200 px-3 py-2 text-sm font-medium">
+                        Accounts
+                    </a>
+                    <a routerLink="/transfer" routerLinkActive="text-gray-200 border-b-2 border-gray-400"
+                       class="text-gray-400 hover:text-white transition duration-200 px-3 py-2 text-sm font-medium">
+                        Transfer
+                    </a>
+                    <a routerLink="/loans" routerLinkActive="text-gray-200 border-b-2 border-gray-400"
+                       class="text-gray-400 hover:text-white transition duration-200 px-3 py-2 text-sm font-medium">
+                        Loans
+                    </a>
+                    <a *ngIf="(currentUser$ | async)?.role === 'admin'" routerLink="/admin" routerLinkActive="text-gray-200 border-b-2 border-gray-400"
+                       class="text-gray-400 hover:text-white transition duration-200 px-3 py-2 text-sm font-medium">
+                        Admin
+                    </a>
+                </div>
+            </div>
+
+            <div class="hidden md:flex md:items-center space-x-4">
+                <span *ngIf="currentUser$ | async as user" class="text-gray-400 text-sm">
+                    {{ user.name }}
+                    <span class="text-xs bg-gray-700 px-2 py-1 rounded-full text-gray-400">{{ user.role }}</span>
+                </span>
+                <button
+                    (click)="onLogout()"
+                    class="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition duration-200 ease-in-out"
+                >
+                    Logout
+                </button>
+            </div>
+
+            <div class="md:hidden flex items-center">
+                <button (click)="toggleMenu()" class="text-gray-400 hover:text-white focus:outline-none focus:text-white">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="md:hidden" [class.hidden]="!isMenuOpen">
+            <div class="px-2 pt-2 pb-3 space-y-1">
+                <a routerLink="/dashboard" class="text-gray-400 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Dashboard</a>
+                <a routerLink="/accounts" class="text-gray-400 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Accounts</a>
+                <a routerLink="/transfer" class="text-gray-400 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Transfer</a>
+                <a routerLink="/loans" class="text-gray-400 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Loans</a>
+                <a *ngIf="(currentUser$ | async)?.role === 'admin'" routerLink="/admin" class="text-gray-400 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Admin</a>
+                <button (click)="onLogout()" class="text-gray-400 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium w-full text-left">Logout</button>
+            </div>
+        </div>
+    </div>
+</nav>

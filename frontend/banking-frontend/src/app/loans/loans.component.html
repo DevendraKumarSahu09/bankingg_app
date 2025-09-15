@@ -1,0 +1,84 @@
+ 
+<div class="min-h-screen bg-gray-50">
+  <app-navbar></app-navbar>
+  
+  <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="px-4 py-6 sm:px-0">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">My Loans</h1>
+        <a routerLink="/loans/apply" 
+           class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+          Apply for New Loan
+        </a>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="loading" class="text-center py-4">
+        <div class="text-gray-500">Loading loans...</div>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+        <div class="text-red-800">{{ error }}</div>
+      </div>
+
+      <!-- Loans Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" *ngIf="!loading">
+        <div *ngFor="let loan of loans" 
+             class="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-medium text-gray-900">
+                {{ loan.loanType | titlecase }} Loan
+              </h3>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    [ngClass]="getStatusColor(loan.status)">
+                {{ loan.status | titlecase }}
+              </span>
+            </div>
+            
+            <div class="space-y-2">
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-500">Loan Amount</span>
+                <span class="text-sm font-medium text-gray-900">${{ loan.amount | number:'1.2-2' }}</span>
+              </div>
+              
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-500">Interest Rate</span>
+                <span class="text-sm font-medium text-gray-900">{{ loan.interestRate }}%</span>
+              </div>
+              
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-500">Tenure</span>
+                <span class="text-sm font-medium text-gray-900">{{ loan.tenureMonths }} months</span>
+              </div>
+              
+              <div class="flex justify-between">
+                <span class="text-sm text-gray-500">Applied Date</span>
+                <span class="text-sm font-medium text-gray-900">{{ loan.createdAt | date:'short' }}</span>
+              </div>
+            </div>
+            
+            <div class="mt-6">
+              <a [routerLink]="['/loans', loan._id]" 
+                 class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-center px-3 py-2 rounded-md text-sm font-medium block">
+                View Details
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="loans.length === 0 && !loading" 
+             class="col-span-full text-center py-12">
+          <div class="text-gray-500 text-lg mb-4">No loans found</div>
+          <a routerLink="/loans/apply" 
+             class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+            Apply for Your First Loan
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

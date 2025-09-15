@@ -1,0 +1,104 @@
+ 
+<div class="min-h-screen bg-gray-50">
+  <app-navbar></app-navbar>
+  
+  <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="px-4 py-6 sm:px-0">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">Loan Management</h1>
+      </div>
+
+      <!-- Success/Error Messages -->
+      <div *ngIf="success" class="mb-4 bg-green-50 border border-green-200 rounded-md p-4">
+        <div class="text-green-800">{{ success }}</div>
+      </div>
+      <div *ngIf="error" class="mb-4 bg-red-50 border border-red-200 rounded-md p-4">
+        <div class="text-red-800">{{ error }}</div>
+      </div>
+
+      <!-- Status Filter -->
+      <div class="bg-white shadow sm:rounded-lg mb-6">
+        <div class="px-4 py-5 sm:p-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Filter by Status</h3>
+          <div class="flex flex-wrap gap-2">
+            <button *ngFor="let option of statusOptions"
+                    (click)="onStatusFilter(option.value)"
+                    [class]="selectedStatus === option.value ? 'bg-indigo-100 text-indigo-800 border-indigo-200' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'"
+                    class="px-3 py-2 border rounded-md text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="loading" class="text-center py-4">
+        <div class="text-gray-500">Loading loans...</div>
+      </div>
+
+      <!-- Loans Table -->
+      <div class="bg-white shadow overflow-hidden sm:rounded-md" *ngIf="!loading">
+        <ul class="divide-y divide-gray-200">
+          <li *ngFor="let loan of filteredLoans" class="px-6 py-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center min-w-0 flex-1">
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center space-x-2">
+                    <p class="text-sm font-medium text-gray-900 truncate">
+                      {{ loan.loanType | titlecase }} Loan - ${{ loan.amount | number:'1.2-2' }}
+                    </p>
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                          [ngClass]="getStatusColor(loan.status)">
+                      {{ loan.status | titlecase }}
+                    </span>
+                  </div>
+                  <div class="mt-1 flex items-center space-x-4 text-sm text-gray-500">
+                    <span>Interest: {{ loan.interestRate }}%</span>
+                    <span>Tenure: {{ loan.tenureMonths }} months</span>
+                    <span>Applied: {{ loan.createdAt | date:'short' }}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="flex items-center space-x-2 ml-4">
+                <!-- Action Buttons for Pending Loans -->
+                <div *ngIf="loan.status === 'pending'" class="flex space-x-2">
+                  <button (click)="updateLoanStatus(loan._id, 'approved')"
+                          class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded text-sm font-medium">
+                    Approve
+                  </button>
+                  <button (click)="updateLoanStatus(loan._id, 'rejected')"
+                          class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-medium">
+                    Reject
+                  </button>
+                </div>
+                
+                <!-- Status Change for Approved Loans -->
+                <div *ngIf="loan.status === 'approved'" class="flex space-x-2">
+                  <button (click)="updateLoanStatus(loan._id, 'active')"
+                          class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded text-sm font-medium">
+                    Activate
+                  </button>
+                </div>
+                
+                <!-- Status Change for Active Loans -->
+                <div *ngIf="loan.status === 'active'" class="flex space-x-2">
+                  <button (click)="updateLoanStatus(loan._id, 'closed')"
+                          class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded text-sm font-medium">
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </li>
+          
+          <!-- Empty State -->
+          <li *ngIf="filteredLoans.length === 0" class="px-6 py-4 text-center text-gray-500">
+            <div class="text-sm">No loans found for the selected filter</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

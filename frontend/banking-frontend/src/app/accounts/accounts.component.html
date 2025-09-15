@@ -1,0 +1,76 @@
+ 
+<div class="min-h-screen bg-gray-50">
+  <app-navbar></app-navbar>
+  
+  <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <div class="px-4 py-6 sm:px-0">
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">My Accounts</h1>
+        <a routerLink="/accounts/create" 
+           class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+          Create New Account
+        </a>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="loading" class="text-center py-4">
+        <div class="text-gray-500">Loading accounts...</div>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
+        <div class="text-red-800">{{ error }}</div>
+      </div>
+
+      <!-- Accounts Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" *ngIf="!loading">
+        <div *ngFor="let account of accounts" 
+             class="bg-white overflow-hidden shadow-lg rounded-lg hover:shadow-xl transition-shadow duration-300">
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-lg font-medium text-gray-900">
+                {{ account.type | titlecase }} Account
+              </h3>
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                    [ngClass]="{
+                      'bg-green-100 text-green-800': account.status === 'active',
+                      'bg-yellow-100 text-yellow-800': account.status === 'frozen',
+                      'bg-red-100 text-red-800': account.status === 'suspended'
+                    }">
+                {{ account.status | titlecase }}
+              </span>
+            </div>
+            
+            <div class="space-y-2">
+              <div class="text-sm text-gray-500">Account Number</div>
+              <div class="font-mono text-sm">{{ account.accountNumber }}</div>
+              
+              <div class="text-sm text-gray-500 mt-4">Current Balance</div>
+              <div class="text-2xl font-bold text-green-600">
+                ${{ account.balance | number:'1.2-2' }}
+              </div>
+            </div>
+            
+            <div class="mt-6 flex space-x-2">
+              <a [routerLink]="['/accounts', account._id]" 
+                 class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white text-center px-3 py-2 rounded-md text-sm font-medium">
+                View Details
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="accounts.length === 0 && !loading" 
+             class="col-span-full text-center py-12">
+          <div class="text-gray-500 text-lg mb-4">No accounts found</div>
+          <a routerLink="/accounts/create" 
+             class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+            Create Your First Account
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

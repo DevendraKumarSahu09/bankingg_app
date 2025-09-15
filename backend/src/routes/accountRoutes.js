@@ -2,6 +2,7 @@ import express from "express";
 import {
   createAccount,
   getAccounts,
+  getAccountById,
   deposit,
   withdraw,
   transfer,
@@ -12,6 +13,7 @@ const router = express.Router();
 
 router.post("/", authMiddleware, createAccount);
 router.get("/", authMiddleware, getAccounts);
+router.get("/:id", authMiddleware, getAccountById);
 router.post("/:id/deposit", authMiddleware, deposit);
 router.post("/:id/withdraw", authMiddleware, withdraw);
 router.post("/transfer", authMiddleware, transfer);

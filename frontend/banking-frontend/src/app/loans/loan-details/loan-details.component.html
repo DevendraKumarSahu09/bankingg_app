@@ -1,0 +1,185 @@
+ 
+<div class="min-h-screen bg-gray-50">
+  <app-navbar></app-navbar>
+  
+  <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+    <!-- Loading State -->
+    <div *ngIf="loading && !loan" class="text-center py-4">
+      <div class="text-gray-500">Loading loan details...</div>
+    </div>
+
+    <div *ngIf="loan" class="space-y-6">
+      <!-- Loan Header -->
+      <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <div class="px-4 py-5 sm:px-6">
+          <h3 class="text-lg leading-6 font-medium text-gray-900">{{ loan.loanType | titlecase }} Loan Details</h3>
+          <p class="mt-1 max-w-2xl text-sm text-gray-500">Loan ID: {{ loan._id }}</p>
+        </div>
+        <div class="border-t border-gray-200 px-4 py-5 sm:px-6">
+          <dl class="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
+            <div>
+              <dt class="text-sm font-medium text-gray-500">Loan Amount</dt>
+              <dd class="mt-1 text-2xl font-bold text-green-600">${{ loan.amount | number:'1.2-2' }}</dd>
+            </div>
+            <div>
+              <dt class="text-sm font-medium text-gray-500">Status</dt>
+              <dd class="mt-1">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+                      [ngClass]="getStatusColor(loan.status)">
+                  {{ loan.status | titlecase }}
+                </span>
+              </dd>
+            </div>
+            <div>
+              <dt class="text-sm font-medium text-gray-500">Interest Rate</dt>
+              <dd class="mt-1 text-sm text-gray-900">{{ loan.interestRate }}% per annum</dd>
+            </div>
+            <div>
+              <dt class="text-sm font-medium text-gray-500">Tenure</dt>
+              <dd class="mt-1 text-sm text-gray-900">{{ loan.tenureMonths }} months</dd>
+            </div>
+            <div>
+              <dt class="text-sm font-medium text-gray-500">Applied Date</dt>
+              <dd class="mt-1 text-sm text-gray-900">{{ loan.createdAt | date:'medium' }}</dd>
+            </div>
+            <div *ngIf="loan.updatedAt !== loan.createdAt">
+              <dt class="text-sm font-medium text-gray-500">Last Updated</dt>
+              <dd class="mt-1 text-sm text-gray-900">{{ loan.updatedAt | date:'medium' }}</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div *ngIf="success" class="bg-green-50 border border-green-200 rounded-md p-4">
+        <div class="text-green-800">{{ success }}</div>
+      </div>
+      <div *ngIf="error" class="bg-red-50 border border-red-200 rounded-md p-4">
+        <div class="text-red-800">{{ error }}</div>
+      </div>
+
+      <!-- Repayment Information (only for approved/active loans) -->
+      <div *ngIf="(loan.status === 'approved' || loan.status === 'active') && repayments.length > 0">
+        <!-- Payment Summary -->
+        <div class="bg-white shadow sm:rounded-lg">
+          <div class="px-4 py-5 sm:p-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Payment Information</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div class="bg-blue-50 p-4 rounded-lg">
+                <div class="text-sm text-blue-600 font-medium">Total Payments</div>
+                <div class="text-2xl font-bold text-blue-900">{{ repayments.length }}</div>
+              </div>
+              <div class="bg-green-50 p-4 rounded-lg">
+                <div class="text-sm text-green-600 font-medium">Paid</div>
+                <div class="text-2xl font-bold text-green-900">{{ getPaidPayments().length }}</div>
+              </div>
+              <div class="bg-yellow-50 p-4 rounded-lg">
+                <div class="text-sm text-yellow-600 font-medium">Outstanding</div>
+                <div class="text-2xl font-bold text-yellow-900">${{ getOutstandingAmount() | number:'1.2-2' }}</div>
+              </div>
+            </div>
+
+            <!-- Next Payment -->
+            <div *ngIf="getNextPayment() as nextPayment" class="mb-6">
+              <h4 class="text-md font-medium text-gray-900 mb-2">Next Payment Due</h4>
+              <div class="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+                <div class="flex justify-between items-center">
+                  <div>
+                    <div class="text-sm text-yellow-800">Due Date: {{ nextPayment.dueDate | date:'mediumDate' }}</div>
+                    <div class="text-lg font-bold text-yellow-900">Amount: ${{ nextPayment.amount | number:'1.2-2' }}</div>
+                  </div>
+                  <button (click)="payNextInstallment()" 
+                          [disabled]="payingInstallment"
+                          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50">
+                    {{ payingInstallment ? 'Processing...' : 'Pay Now' }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Repayment Schedule -->
+        <div class="bg-white shadow overflow-hidden sm:rounded-md">
+          <div class="px-4 py-5 sm:px-6">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Repayment Schedule</h3>
+          </div>
+          <ul class="divide-y divide-gray-200">
+            <li *ngFor="let payment of repayments; let i = index" class="px-6 py-4">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-10 w-10">
+                    <div class="h-10 w-10 rounded-full flex items-center justify-center text-sm font-medium"
+                         [ngClass]="{
+                           'bg-green-100 text-green-800': payment.paid,
+                           'bg-yellow-100 text-yellow-800': !payment.paid
+                         }">
+                      {{ i + 1 }}
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900">
+                      Payment {{ i + 1 }}
+                    </div>
+                    <div class="text-sm text-gray-500">
+                      Due: {{ payment.dueDate | date:'mediumDate' }}
+                    </div>
+                    <div *ngIf="payment.paidDate" class="text-sm text-green-600">
+                      Paid: {{ payment.paidDate | date:'mediumDate' }}
+                    </div>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <div class="text-sm font-medium text-gray-900">
+                    ${{ payment.amount | number:'1.2-2' }}
+                  </div>
+                  <div class="text-sm">
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                          [ngClass]="{
+                            'bg-green-100 text-green-800': payment.paid,
+                            'bg-yellow-100 text-yellow-800': !payment.paid
+                          }">
+                      {{ payment.paid ? 'Paid' : 'Pending' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Loan Status Messages -->
+      <div *ngIf="loan.status === 'pending'" class="bg-yellow-50 border border-yellow-200 rounded-md p-4">
+        <div class="flex">
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-yellow-800">Application Under Review</h3>
+            <div class="mt-2 text-sm text-yellow-700">
+              <p>Your loan application is currently being reviewed by our team. You will be notified once a decision is made.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="loan.status === 'rejected'" class="bg-red-50 border border-red-200 rounded-md p-4">
+        <div class="flex">
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800">Application Rejected</h3>
+            <div class="mt-2 text-sm text-red-700">
+              <p>Unfortunately, your loan application has been rejected. Please contact our support team for more information.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Back Button -->
+      <div class="flex justify-start">
+        <button (click)="router.navigate(['/loans'])" 
+                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+          Back to Loans
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

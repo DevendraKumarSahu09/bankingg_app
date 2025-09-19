@@ -41,7 +41,7 @@ const createApolloProvider = () => {
 
     return {
       link: authLink.concat(httpLink.create({
-        uri: 'http://localhost:4000/graphql',
+        uri: 'https://banking-app-api-tdhs.onrender.com/graphql',
       })),
       cache: new InMemoryCache(),
       defaultOptions: {

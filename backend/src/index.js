@@ -17,7 +17,7 @@ const app = express();
 app.use(express.json());
 
 app.use(cors({
-    origin: ['http://localhost:4200', 'http://127.0.0.1:4200'], // Allow Angular dev server
+    origin: ['https://bankingg-app.onrender.com', 'http://localhost:4200', 'http://127.0.0.1:4200'], // Allow Angular dev server
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization', 'apollo-require-preflight']

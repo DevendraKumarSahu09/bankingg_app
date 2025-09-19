@@ -1,6 +1,6 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:4000',
-  graphqlUrl: 'http://localhost:4000/graphql'
+  apiUrl: 'https://banking-app-api-tdhs.onrender.com',
+  graphqlUrl: 'https://banking-app-api-tdhs.onrender.com/graphql'
 };

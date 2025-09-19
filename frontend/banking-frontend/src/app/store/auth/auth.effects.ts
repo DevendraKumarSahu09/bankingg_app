@@ -22,7 +22,7 @@ export class AuthEffects {
           id
           name
           email
-          role       
+          role
         }
       }
     }
@@ -45,18 +45,16 @@ export class AuthEffects {
       switchMap(({ credentials }) =>
         this.apollo.mutate({
           mutation: this.LOGIN_MUTATION,
-          variables: credentials
+          variables: credentials,
         }).pipe(
-          map((response: any) => {
-            const authData = response.data.login;
+          map((result: any) => {
+            const authData = result.data.login;
             this.saveToLocalStorage(authData);
             return AuthActions.loginSuccess({ authData });
           }),
-          catchError(error => {
-            console.error('Login error:', error);
-            const errorMessage = this.extractErrorMessage(error);
-            return of(AuthActions.loginFailure({ error: errorMessage }));
-          })
+          catchError((error) =>
+            of(AuthActions.loginFailure({ error: this.extractErrorMessage(error) }))
+          )
         )
       )
     )
@@ -68,51 +66,47 @@ export class AuthEffects {
       switchMap(({ userData }) =>
         this.apollo.mutate({
           mutation: this.SIGNUP_MUTATION,
-          variables: { input: userData }
+          variables: { input: userData },
         }).pipe(
-          switchMap(() => {
-            return this.apollo.mutate({
+          switchMap(() =>
+            this.apollo.mutate({
               mutation: this.LOGIN_MUTATION,
-              variables: { email: userData.email, password: userData.password }
+              variables: { email: userData.email, password: userData.password },
             }).pipe(
-              map((response: any) => {
-                const authData = response.data.login;
+              map((result: any) => {
+                const authData = result.data.login;
                 this.saveToLocalStorage(authData);
                 return AuthActions.signupSuccess({ authData });
               })
-            );
-          }),
-          catchError(error => {
-            console.error('Signup error:', error);
-            const errorMessage = this.extractErrorMessage(error);
-            return of(AuthActions.signupFailure({ error: errorMessage }));
-          })
+            )
+          ),
+          catchError((error) =>
+            of(AuthActions.signupFailure({ error: this.extractErrorMessage(error) }))
+          )
         )
       )
     )
   );
 
-  loginSuccess$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(AuthActions.loginSuccess, AuthActions.signupSuccess),
-      tap(() => {
-        console.log('Login/Signup successful, navigating to dashboard');
-        this.router.navigate(['/dashboard']);
-      })
-    ),
+  loginSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.loginSuccess, AuthActions.signupSuccess),
+        tap(() => this.router.navigate(['/dashboard']))
+      ),
     { dispatch: false }
   );
 
-  logout$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(AuthActions.logout),
-      tap(() => {
-        console.log('Logging out user');
-        this.clearLocalStorage();
-        this.apollo.client.clearStore();
-        this.router.navigate(['/login']);
-      })
-    ),
+  logout$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(AuthActions.logout),
+        tap(() => {
+          this.clearLocalStorage();
+          this.apollo.client.clearStore();
+          this.router.navigate(['/login']);
+        })
+      ),
     { dispatch: false }
   );
 

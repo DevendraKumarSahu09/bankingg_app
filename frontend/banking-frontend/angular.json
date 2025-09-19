@@ -83,7 +83,11 @@
             ],
             "styles": [
               "src/styles.css"
-            ]
+            ],
+            "include": [
+              "src/**/*.spec.ts"
+            ],
+            "exclude": []
           }
         }
       }
